@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: cac-platform
+  namespace: eternal
+spec:
+  selector:
+    app: cac-platform
+  ports:
+    - name: http
+      port: 8081 # Port that the service should listen on
+      targetPort: 8081 # Port that the pods are listening on
+  type: ClusterIP # Use LoadBalancer type if running on cloud providers like AWS, GCP etc

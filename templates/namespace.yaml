@@ -1,0 +1,9 @@
+{{- $namespace := .Values.namespace }}
+{{- if not (lookup "v1" "Namespace" "" $namespace) }}
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: {{ $namespace }}
+  labels:
+    {{- include "platformui-Chart.labels" . | nindent 4 }}
+{{- end }}

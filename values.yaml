@@ -1,0 +1,72 @@
+namespace: eternal
+
+service:
+  type: ClusterIP
+  port: 8081 # Port that the service should listen on
+  targetPort: 8081 # Port that the pods are listening on
+
+deployment:
+  autoscaling:
+    enabled: false
+  replicaCount: 1
+  
+  image:
+    repo: 501485087463.dkr.ecr.us-east-1.amazonaws.com/platformui
+    tag: v1.0
+  pullPolicy: Always
+  ports:
+    - name: http
+      containerPort: 8081
+      protocol: TCP
+  env:
+    - name: REACT_APP_DNS_URL
+      value: cacplatformui.com1
+    - name: RANDOM_DNS
+      value: hoodle.com
+    - name: REACT_APP_NODE_ENV
+      value: production
+    - name: REACT_APP_PLATFORM_DNS_URL
+      value: cacplatformapi.default.svc.cluster.local:9091/goengine
+    - name: REACT_APP_KEYCLOAK_URL
+      value: http://keycloak.default.svc.cluster.local:8080/auth
+    - name: REACT_APP_KEYCLOAK_REALM_NAME
+      value: keycloak-cac-platform
+    - name: REACT_APP_KEYCLOAK_CLIENT_ID
+      value: react-auth
+  resources:
+    limits:
+      cpu: 500m
+      memory: 500Mi
+    requests:
+      cpu: 50m
+      memory: 50Mi
+
+ingress:
+  enabled: false
+  ingressClassName: nginx
+  annotations:
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+    nginx.ingress.kubernetes.io/use-regex: "true"
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
+  paths:
+    - pathType: ImplementationSpecific
+      path: /platformui(/|$)(.*)
+      backend:
+        service:
+          name: cac-platform
+          port:
+            number: 8081
+    - pathType: ImplementationSpecific
+      path: /(.*)
+      backend:
+        service:
+          name: cac-platform
+          port:
+            number: 8081
+    - pathType: ImplementationSpecific
+      path: /static(/|$)(.*)
+      backend:
+        service:
+          name: cac-platform
+          port:
+            number: 8081

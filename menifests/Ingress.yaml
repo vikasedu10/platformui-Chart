@@ -1,0 +1,37 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: cac-platform
+  namespace: eternal
+  annotations:
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+    nginx.ingress.kubernetes.io/use-regex: "true"
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
+  # namespace: default
+spec:
+  ingressClassName: nginx
+  rules:
+    #- host: $ELB_DNS
+  - http:
+      paths:
+        - pathType: Prefix
+          path: /platformui(/|$)(.*)
+          backend:
+            service:
+              name: cac-platform
+              port:
+                number: 8081
+        - pathType: ImplementationSpecific
+          path: /(.*)
+          backend:
+            service:
+              name: cac-platform
+              port:
+                number: 8081
+        - path: /static(/|$)(.*)
+          pathType: ImplementationSpecific
+          backend:
+            service:
+              name: cac-platform
+              port:
+                number: 8081

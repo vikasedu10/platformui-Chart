@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cac-platform
+  namespace: eternal
+spec:
+  replicas: 1 # Number of replicas you want to deploy
+  selector:
+    matchLabels:
+      app: cac-platform
+  template:
+    metadata:
+      labels:
+        app: cac-platform
+    spec:
+      containers:
+        - name: cac-platform
+          image: 501485087463.dkr.ecr.us-east-1.amazonaws.com/platformui:v12
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 3000 # Port that your React app is running on
+          env:
+            - name: REACT_APP_DNS_URL
+              value: cacplatformui.com1
+            - name: RANDOM_DNS
+              value: hoodle.com
+            - name: REACT_APP_NODE_ENV
+              value: production
+            - name: REACT_APP_PLATFORM_DNS_URL
+              value: cacplatformapi.default.svc.cluster.local:9091/goengine
+            - name: REACT_APP_KEYCLOAK_URL
+              value: http://keycloak.default.svc.cluster.local:8080/auth
+            - name: REACT_APP_KEYCLOAK_REALM_NAME
+              value: keycloak-cac-platform
+            - name: REACT_APP_KEYCLOAK_CLIENT_ID
+              value: react-auth
+          resources:
+            limits:
+              cpu: 500m
+              memory: 500Mi
+            requests:
+              cpu: 50m
+              memory: 50Mi
